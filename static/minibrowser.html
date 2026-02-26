@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniWeb</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0d0d0f; --surface: #141417; --bar: #1a1a1f; --border: #2a2a35;
+    --accent: #7cffa4; --accent2: #4af0ff; --text: #e8e8f0;
+    --muted: #6a6a80; --danger: #ff5f5f; --warn: #ffbb44;
+  }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overflow: hidden; }
+  #app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* CHROME */
+  #chrome { background: var(--bar); border-bottom: 1px solid var(--border); padding: 10px 14px 8px; display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; user-select: none; }
+  #titlebar { display: flex; align-items: center; gap: 10px; }
+  .dots { display: flex; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: filter 0.15s; }
+  .dot:hover { filter: brightness(1.35); }
+  .dot.r { background: var(--danger); } .dot.y { background: var(--warn); } .dot.g { background: var(--accent); }
+  #brand { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.18em; text-transform: uppercase; }
+
+  /* NAVBAR */
+  #navbar { display: flex; gap: 6px; align-items: center; }
+  .nbtn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s, color 0.15s; flex-shrink: 0; }
+  .nbtn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .nbtn:disabled { opacity: 0.28; cursor: default; }
+  #url-wrap { flex: 1; display: flex; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0 10px; gap: 7px; height: 36px; transition: border-color 0.2s, box-shadow 0.2s; }
+  #url-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,255,164,0.09); }
+  #url-icon { color: var(--accent); font-size: 11px; flex-shrink: 0; }
+  #url-input { background: none; border: none; outline: none; color: var(--text); font-family: 'Space Mono', monospace; font-size: 11.5px; flex: 1; min-width: 0; }
+  #url-input::placeholder { color: var(--muted); }
+  #go-btn { background: var(--accent); color: #000; border: none; border-radius: 7px; padding: 0 16px; height: 28px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; transition: background 0.15s, transform 0.1s; flex-shrink: 0; }
+  #go-btn:hover { background: #a0ffbe; transform: scale(1.04); }
+
+  /* STATUS */
+  #statusbar { display: flex; align-items: center; gap: 6px; padding: 0 2px; }
+  #s-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background 0.25s; flex-shrink: 0; }
+  #s-dot.loading { background: var(--accent2); animation: blink 0.7s infinite alternate; }
+  #s-dot.done { background: var(--accent); } #s-dot.error { background: var(--danger); }
+  @keyframes blink { from { opacity: 1; } to { opacity: 0.2; } }
+  #s-text { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.07em; }
+
+  /* CONTENT */
+  #content { flex: 1; position: relative; overflow: hidden; }
+
+  /* HOME */
+  #home { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; background: var(--bg); z-index: 2; }
+  #home::before { content: ''; position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, rgba(124,255,164,0.05) 0%, transparent 65%); pointer-events: none; }
+  .home-logo h1 { font-size: 56px; font-weight: 800; letter-spacing: -0.03em; background: linear-gradient(130deg, var(--accent) 0%, var(--accent2) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; line-height: 1; }
+  .home-logo p { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.22em; text-transform: uppercase; text-align: center; margin-top: 7px; }
+  #home-form { display: flex; width: min(560px, 90vw); border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; position: relative; z-index: 1; }
+  #home-form:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,255,164,0.08); }
+  #home-input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: 'Syne', sans-serif; font-size: 15px; padding: 14px 18px; }
+  #home-input::placeholder { color: var(--muted); }
+  #home-submit { background: var(--accent); color: #000; border: none; padding: 14px 22px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+  #home-submit:hover { background: #a0ffbe; }
+  .home-hint { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; position: relative; z-index: 1; }
+  .home-hint em { color: var(--accent2); font-style: normal; }
+
+  /* CONFIG BANNER */
+  #config-banner { display: none; background: rgba(255,187,68,0.1); border: 1px solid var(--warn); border-radius: 10px; padding: 10px 16px; max-width: min(560px, 90vw); text-align: center; position: relative; z-index: 1; }
+  #config-banner p { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--warn); line-height: 1.7; letter-spacing: 0.05em; }
+  #config-banner code { background: rgba(255,187,68,0.15); padding: 2px 6px; border-radius: 4px; }
+
+  /* FRAME */
+  #frame-wrap { position: absolute; inset: 0; z-index: 1; display: none; }
+  #browser-frame { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+
+  /* LOADER */
+  #loader { position: absolute; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 10; transition: opacity 0.3s; }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+  .spinner { width: 38px; height: 38px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.65s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-txt { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
+  .proxy-badge { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+
+  /* ERROR */
+  #error-box { position: absolute; inset: 0; background: var(--bg); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 9; }
+  #error-box i { font-size: 36px; color: var(--warn); }
+  #error-box h2 { font-size: 18px; font-weight: 800; }
+  #error-box p { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); text-align: center; max-width: 420px; line-height: 1.8; }
+  .err-actions { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; justify-content: center; }
+  .err-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 9px 18px; border-radius: 8px; font-family: 'Space Mono', monospace; font-size: 11px; text-decoration: none; cursor: pointer; transition: border-color 0.15s; }
+  .err-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .err-btn.primary { border-color: var(--accent2); color: var(--accent2); }
+  .err-btn.primary:hover { background: rgba(74,240,255,0.08); }
+
+  /* BOTTOM */
+  #bottombar { background: var(--bar); border-top: 1px solid var(--border); padding: 5px 14px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+  .binfo { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60vw; }
+  .binfo em { color: var(--accent2); font-style: normal; }
+  .proxy-on { color: var(--accent) !important; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="chrome">
+    <div id="titlebar">
+      <div class="dots">
+        <div class="dot r"></div>
+        <div class="dot y"></div>
+        <div class="dot g" id="dot-home" title="Go Home"></div>
+      </div>
+      <span id="brand">MiniWeb &nbsp;·&nbsp; Interstellar Proxy</span>
+    </div>
+    <div id="navbar">
+      <button class="nbtn" id="btn-back"    title="Back"><i class="fa fa-arrow-left"></i></button>
+      <button class="nbtn" id="btn-forward" title="Forward"><i class="fa fa-arrow-right"></i></button>
+      <button class="nbtn" id="btn-home"    title="Home"><i class="fa fa-house"></i></button>
+      <button class="nbtn" id="btn-refresh" title="Refresh"><i class="fa fa-rotate-right"></i></button>
+      <div id="url-wrap">
+        <i id="url-icon" class="fa fa-shield-halved"></i>
+        <input id="url-input" type="text" placeholder="Search DuckDuckGo or enter any URL…" autocomplete="off" spellcheck="false">
+      </div>
+      <button id="go-btn">Go</button>
+    </div>
+    <div id="statusbar">
+      <div id="s-dot"></div>
+      <span id="s-text">Ready</span>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="home">
+      <div class="home-logo">
+        <h1>MiniWeb</h1>
+        <p>Interstellar Proxy · DuckDuckGo</p>
+      </div>
+      <div id="home-form">
+        <input id="home-input" type="text" placeholder="Search or enter any URL…" autocomplete="off">
+        <button id="home-submit"><i class="fa fa-magnifying-glass"></i>&nbsp; Search</button>
+      </div>
+      <span class="home-hint">Routed via <em>Interstellar</em> — bypasses X-Frame-Options</span>
+      <div id="config-banner">
+        <p>⚠ Set your Interstellar host URL at the top of this file.<br>
+        Open the HTML and change <code>PROXY_HOST</code> on line 1 of the script.</p>
+      </div>
+    </div>
+
+    <div id="frame-wrap">
+      <div id="loader">
+        <div class="spinner"></div>
+        <div class="loader-txt" id="loader-txt">Routing through proxy…</div>
+        <div class="proxy-badge">🛡 Interstellar UV Proxy</div>
+      </div>
+      <div id="error-box">
+        <i class="fa fa-triangle-exclamation"></i>
+        <h2 id="err-title">Something went wrong</h2>
+        <p id="err-msg">The proxy may be offline or the host URL is not configured.</p>
+        <div class="err-actions">
+          <button class="err-btn" id="err-retry"><i class="fa fa-rotate-right"></i>&nbsp; Retry</button>
+          <a class="err-btn primary" id="err-direct" href="#" target="_blank" rel="noopener noreferrer">
+            <i class="fa fa-arrow-up-right-from-square"></i>&nbsp; Open Direct
+          </a>
+        </div>
+      </div>
+      <iframe
+        id="browser-frame"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation allow-storage-access-by-user-activation"
+        src="about:blank"
+      ></iframe>
+    </div>
+  </div>
+
+  <div id="bottombar">
+    <span class="binfo" id="page-info">No page loaded</span>
+    <span class="binfo" id="proxy-status">Proxy: <em>not configured</em></span>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ═══════════════════════════════════════════════════════════
+     ★  CONFIGURATION — paste your Interstellar deploy URL here
+        e.g. "https://my-interstellar.vercel.app"
+        Leave blank to be prompted on first search.
+  ═══════════════════════════════════════════════════════════ */
+  var PROXY_HOST = 'https://edu-production-a3b9.up.railway.app';   // Interstellar proxy
+  var UV_PREFIX  = '/service/';  // Interstellar's default UV prefix
+
+  /* ─── XOR encoder — matches Ultraviolet.codec.xor.encode ─── */
+  function xorEncode(str) {
+    var res = '';
+    for (var i = 0; i < str.length; i++) {
+      res += i % 2 ? String.fromCharCode(str.charCodeAt(i) ^ 2) : str[i];
+    }
+    return encodeURIComponent(res);
+  }
+
+  /* ─── Build full proxy URL ─── */
+  function proxyUrl(rawUrl) {
+    var host = (PROXY_HOST || '').replace(/\/$/, '');
+    return host + UV_PREFIX + xorEncode(rawUrl);
+  }
+
+  /* ─── Resolve input → target URL ─── */
+  function resolveTarget(raw) {
+    raw = (raw || '').trim();
+    if (!raw) return null;
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (/^([\w-]+\.)+[\w]{2,}(\/|$)/i.test(raw)) return 'https://' + raw;
+    return 'https://duckduckgo.com/?q=' + encodeURIComponent(raw) + '&kae=d&k1=-1';
+  }
+
+  /* ─── Elements ─── */
+  var frame       = document.getElementById('browser-frame');
+  var frameWrap   = document.getElementById('frame-wrap');
+  var homeEl      = document.getElementById('home');
+  var loaderEl    = document.getElementById('loader');
+  var loaderTxt   = document.getElementById('loader-txt');
+  var errorBox    = document.getElementById('error-box');
+  var errTitle    = document.getElementById('err-title');
+  var errMsg      = document.getElementById('err-msg');
+  var errRetry    = document.getElementById('err-retry');
+  var errDirect   = document.getElementById('err-direct');
+  var configBanner= document.getElementById('config-banner');
+  var urlInput    = document.getElementById('url-input');
+  var homeInput   = document.getElementById('home-input');
+  var btnBack     = document.getElementById('btn-back');
+  var btnFwd      = document.getElementById('btn-forward');
+  var btnHome     = document.getElementById('btn-home');
+  var btnRefresh  = document.getElementById('btn-refresh');
+  var goBtn       = document.getElementById('go-btn');
+  var dotHome     = document.getElementById('dot-home');
+  var homeSubmit  = document.getElementById('home-submit');
+  var sDot        = document.getElementById('s-dot');
+  var sTxt        = document.getElementById('s-text');
+  var pageInfo    = document.getElementById('page-info');
+  var proxyStatus = document.getElementById('proxy-status');
+
+  /* ─── State ─── */
+  var hist       = [];
+  var idx        = -1;
+  var currentTarget = '';
+  var blockTimer = null;
+
+  /* ─── Init proxy status display ─── */
+  function refreshProxyStatus() {
+    if (PROXY_HOST) {
+      proxyStatus.innerHTML = 'Proxy: <em class="proxy-on">● ' + PROXY_HOST.replace('https://', '') + '</em>';
+      configBanner.style.display = 'none';
+    } else {
+      proxyStatus.innerHTML = 'Proxy: <em>not configured</em>';
+      configBanner.style.display = 'block';
+    }
+  }
+  refreshProxyStatus();
+
+  /* ─── Ask for host if not set ─── */
+  function ensureHost() {
+    if (PROXY_HOST) return true;
+    var input = prompt(
+      'Enter your Interstellar proxy host URL:\n(e.g. https://my-interstellar.vercel.app)',
+      ''
+    );
+    if (input && input.trim()) {
+      PROXY_HOST = input.trim().replace(/\/$/, '');
+      refreshProxyStatus();
+      return true;
+    }
+    return false;
+  }
+
+  /* ─── Helpers ─── */
+  function setStatus(state, msg) { sDot.className = state; sTxt.textContent = msg; }
+  function updateBtns() { btnBack.disabled = idx <= 0; btnFwd.disabled = idx >= hist.length - 1; }
+
+  function showHome() {
+    homeEl.style.display    = 'flex';
+    frameWrap.style.display = 'none';
+    urlInput.value = '';
+    pageInfo.textContent = 'No page loaded';
+    setStatus('', 'Ready');
+  }
+
+  function showFrame() {
+    homeEl.style.display    = 'none';
+    frameWrap.style.display = 'block';
+  }
+
+  function showLoader(msg) {
+    loaderEl.classList.remove('hidden');
+    loaderTxt.textContent = msg || 'Routing through proxy…';
+    errorBox.style.display = 'none';
+    setStatus('loading', 'Loading via proxy…');
+  }
+
+  function hideLoader() { loaderEl.classList.add('hidden'); }
+
+  function showError(title, msg) {
+    hideLoader();
+    errTitle.textContent = title || 'Load Failed';
+    errMsg.textContent   = msg   || 'The proxy may be offline or unreachable.';
+    errorBox.style.display = 'flex';
+    setStatus('error', 'Error');
+  }
+
+  /* ─── Core navigate ─── */
+  function navigate(rawInput) {
+    if (!ensureHost()) return;
+
+    var target = resolveTarget(rawInput);
+    if (!target) return;
+    currentTarget = target;
+
+    var pUrl = proxyUrl(target);
+
+    /* history management */
+    if (idx < hist.length - 1) hist = hist.slice(0, idx + 1);
+    hist.push({ target: target, proxy: pUrl });
+    idx = hist.length - 1;
+    updateBtns();
+
+    urlInput.value   = target;
+    pageInfo.textContent = target;
+
+    showFrame();
+    showLoader('Routing through proxy…');
+
+    /* fallback timeout — proxy may be offline */
+    clearTimeout(blockTimer);
+    blockTimer = setTimeout(function () {
+      if (!loaderEl.classList.contains('hidden')) {
+        showError(
+          'Proxy Timeout',
+          'No response from the proxy after 12 seconds.\nMake sure your Interstellar instance is running and the URL is correct.'
+        );
+        errDirect.href = target;
+      }
+    }, 12000);
+
+    frame.src = pUrl;
+  }
+
+  /* ─── iframe events ─── */
+  frame.addEventListener('load', function () {
+    clearTimeout(blockTimer);
+    if (frame.src === 'about:blank' || frame.src === '') return;
+    hideLoader();
+    errorBox.style.display = 'none';
+    setStatus('done', 'Loaded via proxy');
+    try {
+      var t = frame.contentDocument && frame.contentDocument.title;
+      if (t && t !== 'about:blank') pageInfo.textContent = t;
+    } catch (e) {}
+  });
+
+  frame.addEventListener('error', function () {
+    clearTimeout(blockTimer);
+    showError('Connection Failed', 'Could not reach the proxy. Check that your Interstellar host is online.');
+    errDirect.href = currentTarget;
+  });
+
+  /* ─── Button events ─── */
+  goBtn.addEventListener('click', function () { navigate(urlInput.value); });
+  urlInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') navigate(urlInput.value); });
+
+  homeSubmit.addEventListener('click', function () {
+    var v = homeInput.value;
+    homeInput.value = '';
+    navigate(v);
+  });
+  homeInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { var v = homeInput.value; homeInput.value = ''; navigate(v); }
+  });
+
+  btnBack.addEventListener('click', function () {
+    if (idx > 0) {
+      idx--;
+      updateBtns();
+      var entry = hist[idx];
+      urlInput.value = entry.target;
+      showFrame();
+      showLoader('Going back…');
+      frame.src = entry.proxy;
+    }
+  });
+
+  btnFwd.addEventListener('click', function () {
+    if (idx < hist.length - 1) {
+      idx++;
+      updateBtns();
+      var entry = hist[idx];
+      urlInput.value = entry.target;
+      showFrame();
+      showLoader('Going forward…');
+      frame.src = entry.proxy;
+    }
+  });
+
+  btnHome.addEventListener('click', showHome);
+  dotHome.addEventListener('click', showHome);
+
+  btnRefresh.addEventListener('click', function () {
+    var entry = hist[idx];
+    if (entry) {
+      errorBox.style.display = 'none';
+      showLoader('Refreshing…');
+      frame.src = entry.proxy;
+    }
+  });
+
+  errRetry.addEventListener('click', function () {
+    var entry = hist[idx];
+    if (entry) {
+      errorBox.style.display = 'none';
+      showLoader('Retrying…');
+      clearTimeout(blockTimer);
+      blockTimer = setTimeout(function () {
+        if (!loaderEl.classList.contains('hidden')) showError('Still timing out', 'Proxy is not responding.');
+      }, 12000);
+      frame.src = entry.proxy;
+    }
+  });
+
+  /* ─── Init ─── */
+  updateBtns();
+  showHome();
+
+})();
+</script>
+</body>
+</html>
