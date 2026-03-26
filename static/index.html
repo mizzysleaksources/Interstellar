@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* ── RESET & BASE ── */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
@@ -22,7 +21,6 @@
       overflow: hidden;
     }
 
-    /* ── STAR CANVAS ── */
     #starfield {
       position: fixed;
       inset: 0;
@@ -30,10 +28,8 @@
       pointer-events: none;
     }
 
-    /* ── NAV — keep Interstellar's nav working ── */
     .f-nav { position: relative; z-index: 100; }
 
-    /* ── MAIN CONTENT ── */
     #particles-js {
       position: relative;
       z-index: 1;
@@ -51,33 +47,19 @@
       text-align: center;
     }
 
-    /* ── TITLE ── */
     .title {
       font-size: clamp(52px, 10vw, 96px);
       font-weight: 900;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #fff;
-      text-shadow:
-        0 0 40px rgba(255,255,255,0.15),
-        0 0 80px rgba(255,255,255,0.05);
+      text-shadow: 0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(255,255,255,0.05);
       animation: fadeDown 0.8s ease both;
     }
 
     @keyframes fadeDown {
       from { opacity: 0; transform: translateY(-24px); }
       to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── SUBTITLE ── */
-    .subtitle {
-      font-size: 13px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: #555;
-      margin-top: -4px;
-      margin-bottom: 10px;
-      animation: fadeDown 0.9s ease 0.1s both;
     }
 
     #splash {
@@ -87,7 +69,6 @@
       min-height: 16px;
     }
 
-    /* ── SEARCH ── */
     .search-container {
       width: min(600px, 88vw);
       margin-top: 14px;
@@ -131,26 +112,193 @@
       padding: 16px 24px;
       font-size: 13px;
       font-weight: 700;
-      font-family: inherit;
-      letter-spacing: 0.05em;
       cursor: pointer;
       transition: background 0.15s;
-      white-space: nowrap;
     }
     .search-btn:hover { background: #ddd; }
+
+    /* ── BOOKMARKS ── */
+    .bookmarks-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+      max-width: min(700px, 90vw);
+    }
+
+    .bookmark {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .bookmark-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #111;
+      border: 1px solid #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      transition: background 0.15s, border-color 0.15s;
+      overflow: hidden;
+    }
+    .bookmark-icon img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .bookmark:hover .bookmark-icon {
+      background: #1a1a1a;
+      border-color: #444;
+    }
+
+    .bookmark-label {
+      font-size: 11px;
+      color: #555;
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bookmark-delete {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 18px;
+      height: 18px;
+      background: #333;
+      border: 1px solid #555;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .bookmark:hover .bookmark-delete { display: flex; }
+
+    .add-bookmark {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #0e0e0e;
+      border: 1px dashed #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #444;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .add-bookmark:hover { border-color: #666; color: #888; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 18px;
+      padding: 28px 28px 24px;
+      width: min(360px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+
+    .modal input {
+      background: #0e0e0e;
+      border: 1px solid #222;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      padding: 12px 14px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .modal input:focus { border-color: #444; }
+    .modal input::placeholder { color: #333; }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .btn-cancel {
+      background: none;
+      border: 1px solid #333;
+      color: #555;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-cancel:hover { border-color: #555; color: #888; }
+
+    .btn-save {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background 0.15s;
+    }
+    .btn-save:hover { background: #ddd; }
   </style>
 </head>
 <body>
 
-<!-- Falling stars canvas -->
 <canvas id="starfield"></canvas>
-
 <div class="f-nav"></div>
 
 <div id="particles-js">
   <div class="main">
     <h1 class="title">Proxy</h1>
-    <p class="subtitle">Made by Eric</p>
     <p id="splash"></p>
     <div class="search-container">
       <form id="fv" method="POST">
@@ -158,91 +306,158 @@
         <button class="search-btn" type="submit"><i class="fa fa-magnifying-glass"></i></button>
       </form>
     </div>
+
+    <div class="bookmarks-row" id="bookmarks-row">
+      <div class="add-bookmark" id="add-btn" title="Add bookmark">+</div>
+    </div>
   </div>
 </div>
 
-<!-- Keep all original Interstellar scripts so search still works -->
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3>ADD BOOKMARK</h3>
+    <input type="text" id="bm-name" placeholder="Name (e.g. YouTube)" maxlength="20" />
+    <input type="text" id="bm-url" placeholder="URL (e.g. https://youtube.com)" />
+    <div class="modal-btns">
+      <button class="btn-cancel" id="modal-cancel">Cancel</button>
+      <button class="btn-save" id="modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
 <script src="assets/js/index-3.js"></script>
 <script src="/assets/js/h1.js"></script>
 <script src="./assets/mathematics/bundle.js?v=2025-04-15"></script>
 <script src="./assets/mathematics/config.js?v=2025-04-15"></script>
 <script src="/assets/js/m1.js"></script>
 
-<!-- Falling stars -->
+<script>
+function getBookmarks() {
+  return JSON.parse(localStorage.getItem('ep_bookmarks') || '[]');
+}
+function saveBookmarks(bms) {
+  localStorage.setItem('ep_bookmarks', JSON.stringify(bms));
+}
+function getFavicon(url) {
+  try {
+    const host = new URL(url).hostname;
+    return 'https://www.google.com/s2/favicons?domain=' + host + '&sz=64';
+  } catch { return null; }
+}
+function renderBookmarks() {
+  const row = document.getElementById('bookmarks-row');
+  const addBtn = document.getElementById('add-btn');
+  row.querySelectorAll('.bookmark').forEach(b => b.remove());
+  const bms = getBookmarks();
+  bms.forEach((bm, i) => {
+    const el = document.createElement('div');
+    el.className = 'bookmark';
+
+    const icon = document.createElement('div');
+    icon.className = 'bookmark-icon';
+    const fav = getFavicon(bm.url);
+    if (fav) {
+      const img = document.createElement('img');
+      img.src = fav;
+      img.onerror = () => { img.remove(); icon.textContent = bm.name[0]; };
+      icon.appendChild(img);
+    } else {
+      icon.textContent = bm.name[0];
+    }
+
+    const label = document.createElement('div');
+    label.className = 'bookmark-label';
+    label.textContent = bm.name;
+
+    const del = document.createElement('div');
+    del.className = 'bookmark-delete';
+    del.innerHTML = '&times;';
+    del.onclick = (e) => {
+      e.stopPropagation();
+      const list = getBookmarks();
+      list.splice(i, 1);
+      saveBookmarks(list);
+      renderBookmarks();
+    };
+
+    el.appendChild(del);
+    el.appendChild(icon);
+    el.appendChild(label);
+    el.onclick = () => {
+      let url = bm.url;
+      if (!url.startsWith('http')) url = 'https://' + url;
+      if (typeof processUrl === 'function') processUrl(url, '/d');
+      else location.href = url;
+    };
+
+    row.insertBefore(el, addBtn);
+  });
+}
+
+const overlay = document.getElementById('modal-overlay');
+document.getElementById('add-btn').onclick = () => overlay.classList.add('open');
+document.getElementById('modal-cancel').onclick = () => {
+  overlay.classList.remove('open');
+  document.getElementById('bm-name').value = '';
+  document.getElementById('bm-url').value = '';
+};
+document.getElementById('modal-save').onclick = () => {
+  const name = document.getElementById('bm-name').value.trim();
+  const url  = document.getElementById('bm-url').value.trim();
+  if (!name || !url) return;
+  const bms = getBookmarks();
+  bms.push({ name, url });
+  saveBookmarks(bms);
+  renderBookmarks();
+  overlay.classList.remove('open');
+  document.getElementById('bm-name').value = '';
+  document.getElementById('bm-url').value = '';
+};
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) {
+    overlay.classList.remove('open');
+    document.getElementById('bm-name').value = '';
+    document.getElementById('bm-url').value = '';
+  }
+});
+
+renderBookmarks();
+</script>
+
 <script>
 (function () {
   var canvas = document.getElementById('starfield');
   var ctx    = canvas.getContext('2d');
   var stars  = [];
   var NUM    = 180;
-
-  function resize() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   function randomStar() {
-    return {
-      x:     Math.random() * canvas.width,
-      y:     Math.random() * canvas.height - canvas.height,
-      len:   Math.random() * 18 + 6,
-      speed: Math.random() * 4 + 2,
-      width: Math.random() * 1.2 + 0.2,
-      alpha: Math.random() * 0.6 + 0.2
-    };
+    return { x: Math.random()*canvas.width, y: Math.random()*canvas.height-canvas.height,
+      len: Math.random()*18+6, speed: Math.random()*4+2, width: Math.random()*1.2+0.2, alpha: Math.random()*0.6+0.2 };
   }
-
   function init() {
-    resize();
-    stars = [];
-    for (var i = 0; i < NUM; i++) {
-      var s = randomStar();
-      s.y = Math.random() * canvas.height; // spread on load
-      stars.push(s);
-    }
+    resize(); stars = [];
+    for (var i=0;i<NUM;i++){var s=randomStar();s.y=Math.random()*canvas.height;stars.push(s);}
   }
-
   function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (var i = 0; i < stars.length; i++) {
-      var s = stars[i];
-
-      // trail
-      var grad = ctx.createLinearGradient(s.x, s.y, s.x, s.y + s.len);
-      grad.addColorStop(0, 'rgba(255,255,255,0)');
-      grad.addColorStop(1, 'rgba(255,255,255,' + s.alpha + ')');
-
-      ctx.beginPath();
-      ctx.moveTo(s.x, s.y);
-      ctx.lineTo(s.x, s.y + s.len);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth   = s.width;
-      ctx.stroke();
-
-      // dot at tip
-      ctx.beginPath();
-      ctx.arc(s.x, s.y + s.len, s.width * 0.8, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,' + s.alpha + ')';
-      ctx.fill();
-
-      // move down
-      s.y += s.speed;
-
-      // reset when off screen
-      if (s.y > canvas.height) {
-        var ns = randomStar();
-        ns.y = -s.len;
-        stars[i] = ns;
-      }
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(var i=0;i<stars.length;i++){
+      var s=stars[i];
+      var grad=ctx.createLinearGradient(s.x,s.y,s.x,s.y+s.len);
+      grad.addColorStop(0,'rgba(255,255,255,0)');
+      grad.addColorStop(1,'rgba(255,255,255,'+s.alpha+')');
+      ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x,s.y+s.len);
+      ctx.strokeStyle=grad;ctx.lineWidth=s.width;ctx.stroke();
+      ctx.beginPath();ctx.arc(s.x,s.y+s.len,s.width*0.8,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+s.alpha+')';ctx.fill();
+      s.y+=s.speed;
+      if(s.y>canvas.height){var ns=randomStar();ns.y=-s.len;stars[i]=ns;}
     }
-
     requestAnimationFrame(draw);
   }
-
-  window.addEventListener('resize', function () { resize(); });
-  init();
-  draw();
+  window.addEventListener('resize',function(){resize();});
+  init();draw();
 })();
 </script>
 
