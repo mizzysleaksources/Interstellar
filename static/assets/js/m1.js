@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const html = `
       <div id="icon-container">
-        <a class="icon" href="/./"><img alt="nav" id="INImg" src="${LogoUrl}"/></a>
+        <a class="icon" href="/./" style="font-size:22px;font-weight:900;color:#fff;text-decoration:none;letter-spacing:0.05em;">EP</a>
       </div>
       <div class="f-nav-right">
         ${qp ? "" : '<a class="navbar-link" href="/./d"><i class="fa-solid fa-laptop navbar-icon"></i><an>&#84;&#97;</an><an>&#98;&#115;</an></a>'}
